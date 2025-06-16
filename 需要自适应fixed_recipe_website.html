@@ -1,0 +1,1304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CookCraft - Your Personal Culinary Experience</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .form-container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e1e1;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .ingredients-container {
+            position: relative;
+        }
+
+        .ingredient-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 10px;
+            min-height: 50px;
+            padding: 8px;
+            border: 2px solid #e1e1e1;
+            border-radius: 8px;
+            background: white;
+            align-items: center;
+        }
+
+        .ingredient-tag {
+            background: #667eea;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .ingredient-tag .remove {
+            cursor: pointer;
+            font-weight: bold;
+            background: rgba(255,255,255,0.3);
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        .ingredient-input {
+            border: none;
+            outline: none;
+            flex: 1;
+            min-width: 200px;
+            font-size: 16px;
+            padding: 8px;
+        }
+
+        .suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .suggestion {
+            padding: 12px;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+            transition: background 0.2s;
+        }
+
+        .suggestion:hover {
+            background: #f8f9fa;
+        }
+
+        .suggestion:last-child {
+            border-bottom: none;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            display: block;
+            margin: 30px auto 0;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .spice-check-section {
+            display: none;
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+
+        .spice-categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 15px;
+        }
+
+        .spice-category {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+        }
+
+        .spice-category h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .ingredient-checkbox {
+            display: flex;
+            align-items: center;
+            margin: 8px 0;
+        }
+
+        .ingredient-checkbox input {
+            width: auto;
+            margin-right: 8px;
+        }
+
+        .results {
+            display: none;
+            margin-top: 30px;
+        }
+
+        .category {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .category h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 2em;
+            text-align: center;
+        }
+
+        .recipe-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+            transition: transform 0.3s;
+        }
+
+        .recipe-card:hover {
+            transform: translateX(5px);
+        }
+
+        .recipe-card h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .recipe-meta {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .recipe-meta span {
+            background: #e9ecef;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        .select-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 10px;
+            transition: background 0.3s;
+        }
+
+        .select-btn:hover {
+            background: #218838;
+        }
+
+        .selected {
+            background: #d4edda !important;
+            border-left-color: #28a745 !important;
+        }
+
+        .cooking-instructions {
+            display: none;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .recipe-section {
+            margin-bottom: 30px;
+            border: 1px solid #e1e1e1;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .recipe-header {
+            background: #667eea;
+            color: white;
+            padding: 15px 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .recipe-header:hover {
+            background: #5a6fd8;
+        }
+
+        .recipe-content {
+            display: none;
+            padding: 20px;
+        }
+
+        .recipe-content.active {
+            display: block;
+        }
+
+        .step {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid #667eea;
+        }
+
+        .step h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .step p {
+            line-height: 1.6;
+            margin-bottom: 8px;
+        }
+
+        .tip {
+            background: #e8f5e8;
+            border-left: 3px solid #28a745;
+            padding: 10px;
+            margin-top: 10px;
+            font-style: italic;
+            color: #155724;
+            border-radius: 5px;
+        }
+
+        .fold-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 15px;
+        }
+
+        .fold-btn:hover {
+            background: #5a6268;
+        }
+
+        .experience-section {
+            display: none;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .experience-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        .experience-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .experience-card h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .form-container {
+                padding: 20px;
+            }
+
+            .spice-categories {
+                grid-template-columns: 1fr;
+            }
+
+            .experience-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🍽️ CookCraft</h1>
+            <p>Transform your ingredients into unforgettable culinary experiences</p>
+        </div>
+
+        <div class="form-container">
+            <form id="recipeForm">
+                <div class="form-group">
+                    <label>What ingredients do you have?</label>
+                    <div class="ingredients-container">
+                        <div class="ingredient-tags" id="ingredientTags">
+                            <input type="text" class="ingredient-input" id="ingredientInput" placeholder="Start typing ingredients...">
+                        </div>
+                        <div class="suggestions" id="suggestions"></div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="people">Number of people</label>
+                        <select id="people">
+                            <option value="1">1 person</option>
+                            <option value="2">2 people</option>
+                            <option value="4">4 people</option>
+                            <option value="6">6 people</option>
+                            <option value="8">8+ people</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="cuisine">Cuisine Style</label>
+                        <select id="cuisine">
+                            <option value="any">Any Cuisine</option>
+                            <option value="italian">Italian</option>
+                            <option value="asian">Asian</option>
+                            <option value="mexican">Mexican</option>
+                            <option value="american">American</option>
+                            <option value="french">French</option>
+                            <option value="mediterranean">Mediterranean</option>
+                            <option value="indian">Indian</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="level">Dining Level</label>
+                        <select id="level">
+                            <option value="simple">Simple & Quick</option>
+                            <option value="casual">Casual Dining</option>
+                            <option value="fine">Fine Dining</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="occasion">Occasion</label>
+                        <select id="occasion">
+                            <option value="casual">Casual Meal</option>
+                            <option value="romantic">Romantic Dinner</option>
+                            <option value="family">Family Gathering</option>
+                            <option value="friends">Friends Night</option>
+                            <option value="celebration">Celebration</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="dietary">Dietary Restrictions (optional)</label>
+                    <input type="text" id="dietary" placeholder="e.g., vegetarian, gluten-free, low-carb...">
+                </div>
+
+                <button type="submit" class="btn">✨ Create My Culinary Experience</button>
+            </form>
+        </div>
+
+        <div class="spice-check-section" id="spiceCheck">
+            <h3>🌶️ Let's check your pantry essentials!</h3>
+            <p>To create the perfect dishes, please check which of these common pantry items you have:</p>
+            <div class="spice-categories" id="spiceCategories"></div>
+            <button type="button" class="btn" onclick="generateRecipesWithSpices()">Continue with Selected Items</button>
+        </div>
+
+        <div class="results" id="results">
+            <div id="dynamicCategories"></div>
+            <button class="btn" onclick="generateInstructions()">👨‍🍳 Get Cooking Instructions</button>
+        </div>
+
+        <div class="cooking-instructions" id="instructions">
+            <h2>🔥 Step-by-Step Cooking Instructions</h2>
+            <p style="margin-bottom: 20px; font-style: italic; color: #666;">Follow each recipe carefully. I'll guide you through every step like you're in my kitchen!</p>
+            <div id="instructionContent"></div>
+            <button class="btn" onclick="showExperience()">🌟 Complete the Experience</button>
+        </div>
+
+        <div class="experience-section" id="experience">
+            <h2>🎭 Complete Your Experience</h2>
+            <div class="experience-grid">
+                <div class="experience-card">
+                    <h3>🍷 Drink Pairings</h3>
+                    <div id="drinks"></div>
+                </div>
+                <div class="experience-card">
+                    <h3>🍰 Dessert Suggestions</h3>
+                    <div id="desserts"></div>
+                </div>
+                <div class="experience-card">
+                    <h3>🎵 Music</h3>
+                    <div id="music"></div>
+                </div>
+                <div class="experience-card">
+                    <h3>🎬 Entertainment</h3>
+                    <div id="entertainment"></div>
+                </div>
+                <div class="experience-card">
+                    <h3>🕯️ Ambiance & Decor</h3>
+                    <div id="ambiance"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const commonIngredients = [
+            'chicken breast', 'ground beef', 'salmon', 'shrimp', 'eggs', 'milk', 'cheese', 'butter',
+            'olive oil', 'onions', 'garlic', 'tomatoes', 'potatoes', 'carrots', 'bell peppers',
+            'broccoli', 'spinach', 'mushrooms', 'rice', 'pasta', 'bread', 'flour', 'sugar',
+            'lemon', 'lime', 'ginger', 'basil', 'parsley', 'cilantro', 'thyme', 'oregano',
+            'soy sauce', 'vinegar', 'honey', 'cream', 'yogurt', 'bacon', 'ground turkey',
+            'cauliflower', 'zucchini', 'cucumber', 'avocado', 'beans', 'chickpeas', 'coconut milk',
+            'mozzarella', 'strawberries', 'bananas', 'chocolate', 'vanilla', 'nuts', 'berries'
+        ];
+
+        const pantryEssentials = {
+            'Basic Seasonings': ['salt', 'black pepper', 'garlic powder', 'onion powder'],
+            'Cooking Oils & Fats': ['vegetable oil', 'olive oil', 'butter'],
+            'Italian Essentials': ['parmesan cheese', 'balsamic vinegar', 'dried oregano', 'red pepper flakes'],
+            'Asian Essentials': ['soy sauce', 'sesame oil', 'rice vinegar', 'fresh ginger'],
+            'Mexican Essentials': ['cumin', 'chili powder', 'paprika', 'lime juice'],
+            'Baking Basics': ['all-purpose flour', 'baking powder', 'vanilla extract'],
+            'French Cooking': ['white wine', 'heavy cream', 'dijon mustard', 'fresh herbs'],
+            'American Staples': ['ketchup', 'mayonnaise', 'worcestershire sauce', 'brown sugar'],
+            'Mediterranean': ['lemon juice', 'feta cheese', 'olives', 'dried thyme'],
+            'Indian Spices': ['curry powder', 'turmeric', 'garam masala', 'coriander']
+        };
+
+        const detailedRecipeSteps = {
+            'Italian Herb Chicken': [
+                {
+                    title: "Prep your chicken and workspace",
+                    instruction: "Remove chicken from fridge 15 minutes before cooking to bring to room temperature. Pat each breast completely dry with paper towels - this is crucial for a good sear. Season both sides generously with salt and black pepper.",
+                    tip: "Room temperature chicken cooks more evenly and gets a better sear!"
+                },
+                {
+                    title: "Heat your pan properly",
+                    instruction: "Heat 2 tablespoons olive oil in a large skillet over medium-high heat. The oil should shimmer but not smoke. Test by dropping a small piece of chicken - it should sizzle immediately.",
+                    tip: "A properly heated pan prevents sticking and creates that golden crust."
+                },
+                {
+                    title: "Sear the chicken",
+                    instruction: "Gently place chicken in the pan. Don't move it for 5-6 minutes! You'll hear it sizzling. When you lift the edge, it should be golden brown. Flip and cook another 4-5 minutes.",
+                    tip: "Resist the urge to move the chicken - let it develop that beautiful crust!"
+                },
+                {
+                    title: "Check doneness and rest",
+                    instruction: "Insert a meat thermometer into the thickest part - it should read 165°F (74°C). Remove from heat and let rest on a cutting board for 5 minutes before slicing.",
+                    tip: "Resting allows juices to redistribute, keeping your chicken moist and tender."
+                },
+                {
+                    title: "Make the herb finish",
+                    instruction: "In the same pan, add minced garlic and cook for 30 seconds until fragrant. Add fresh herbs (or dried oregano) and a splash of lemon juice. Swirl to combine.",
+                    tip: "Using the same pan captures all those delicious browned bits!"
+                },
+                {
+                    title: "Plate and serve",
+                    instruction: "Slice chicken diagonally and arrange on plates. Drizzle with the herb pan sauce and sprinkle with parmesan cheese if available. Serve immediately.",
+                    tip: "Diagonal slicing makes the chicken look restaurant-quality and easier to eat."
+                }
+            ],
+            'Asian Glazed Chicken': [
+                {
+                    title: "Prepare the glaze",
+                    instruction: "In a small bowl, whisk together 3 tablespoons soy sauce, 1 tablespoon honey (or brown sugar), 1 teaspoon minced ginger, and 1 teaspoon sesame oil. Set aside.",
+                    tip: "Make your glaze first so it's ready when you need it - timing is everything in Asian cooking!"
+                },
+                {
+                    title: "Prep and season chicken",
+                    instruction: "Cut chicken into bite-sized pieces for faster, more even cooking. Season lightly with salt and pepper. Heat 1 tablespoon vegetable oil in a large pan or wok over high heat.",
+                    tip: "High heat is key for that signature Asian 'wok hei' flavor!"
+                },
+                {
+                    title: "Stir-fry the chicken",
+                    instruction: "Add chicken pieces in a single layer. Let them sear for 2 minutes without stirring, then stir-fry for another 3-4 minutes until golden and cooked through.",
+                    tip: "Don't overcrowd the pan - cook in batches if necessary for the best sear."
+                },
+                {
+                    title: "Add aromatics",
+                    instruction: "Push chicken to one side of pan. Add minced garlic and ginger to the empty space. Stir for 30 seconds until fragrant, then mix with chicken.",
+                    tip: "This technique prevents the aromatics from burning while still building layers of flavor."
+                },
+                {
+                    title: "Glaze and finish",
+                    instruction: "Pour the prepared glaze over chicken. Stir constantly for 1-2 minutes until the sauce thickens and coats the chicken with a glossy finish.",
+                    tip: "The sauce will thicken quickly, so keep stirring to prevent burning!"
+                },
+                {
+                    title: "Garnish and serve",
+                    instruction: "Remove from heat and garnish with sliced green onions or sesame seeds if available. Serve immediately over steamed rice.",
+                    tip: "Serve immediately while the glaze is still glossy and the chicken is hot!"
+                }
+            ],
+            'Fresh Bruschetta': [
+                {
+                    title: "Prepare the bread",
+                    instruction: "Slice bread into 1/2-inch thick pieces. Brush both sides lightly with olive oil. Toast in a 400°F oven for 5-7 minutes until golden and crispy.",
+                    tip: "Good bread is the foundation - use day-old bread for the best texture!"
+                },
+                {
+                    title: "Make the tomato mixture",
+                    instruction: "Dice fresh tomatoes into small, uniform pieces. Place in a bowl and sprinkle with salt. Let sit for 10 minutes to draw out excess moisture.",
+                    tip: "Salting the tomatoes prevents soggy bruschetta - a classic Italian technique!"
+                },
+                {
+                    title: "Add aromatics and herbs",
+                    instruction: "Drain excess liquid from tomatoes. Add minced garlic, chopped fresh basil (or dried oregano), a drizzle of olive oil, and a pinch of black pepper. Mix gently.",
+                    tip: "Add garlic sparingly - raw garlic can be overpowering!"
+                },
+                {
+                    title: "Assemble and serve",
+                    instruction: "Rub the warm toasted bread with a cut garlic clove for extra flavor. Top each slice with the tomato mixture just before serving.",
+                    tip: "Assemble right before serving to keep the bread crispy - soggy bruschetta is nobody's friend!"
+                }
+            ],
+            'Creamy Garlic Pasta': [
+                {
+                    title: "Boil pasta water",
+                    instruction: "Fill a large pot with water, add 1 tablespoon salt, and bring to a rolling boil. Add pasta and cook according to package directions until al dente.",
+                    tip: "Save 1 cup of pasta water before draining - it's liquid gold for your sauce!"
+                },
+                {
+                    title: "Start the garlic base",
+                    instruction: "While pasta cooks, heat 3 tablespoons olive oil in a large pan over medium heat. Add thinly sliced garlic and cook for 1-2 minutes until fragrant but not brown.",
+                    tip: "Don't let the garlic brown or it will taste bitter - keep the heat moderate!"
+                },
+                {
+                    title: "Create the cream sauce",
+                    instruction: "Add 1/2 cup heavy cream to the garlic oil. Bring to a gentle simmer and cook for 2-3 minutes until slightly thickened.",
+                    tip: "If you don't have cream, use butter and pasta water for a lighter sauce!"
+                },
+                {
+                    title: "Combine pasta and sauce",
+                    instruction: "Drain pasta and immediately add to the cream sauce. Toss vigorously for 1-2 minutes, adding pasta water if needed for consistency.",
+                    tip: "The starchy pasta water helps bind the sauce to the pasta perfectly!"
+                },
+                {
+                    title: "Season and finish",
+                    instruction: "Remove from heat. Add grated parmesan cheese, salt, and black pepper to taste. Toss once more and serve immediately.",
+                    tip: "Always taste and adjust seasoning at the end - every palate is different!"
+                }
+            ],
+            'Simple Berry Parfait': [
+                {
+                    title: "Prepare your berries",
+                    instruction: "Rinse fresh berries gently and pat dry. If using strawberries, hull and slice them. For extra sweetness, toss berries with 1 tablespoon honey.",
+                    tip: "Room temperature berries have more flavor than cold ones!"
+                },
+                {
+                    title: "Layer the parfait",
+                    instruction: "In glasses or bowls, start with a layer of yogurt, add a layer of berries, then sprinkle with granola or nuts if available.",
+                    tip: "Use clear glasses to show off the beautiful layers!"
+                },
+                {
+                    title: "Repeat and garnish",
+                    instruction: "Continue layering until glasses are full. Top with a final dollop of yogurt and a few perfect berries. Drizzle with honey if desired.",
+                    tip: "Assemble just before serving to keep the layers distinct and the textures perfect!"
+                }
+            ],
+            'Chocolate Avocado Mousse': [
+                {
+                    title: "Prepare avocados",
+                    instruction: "Cut 2 ripe avocados in half, remove pits, and scoop flesh into a food processor or blender. Make sure avocados are very ripe for the creamiest texture.",
+                    tip: "Ripe avocados should yield to gentle pressure - they're the secret to silky mousse!"
+                },
+                {
+                    title: "Add chocolate and sweeteners",
+                    instruction: "Add 1/4 cup unsweetened cocoa powder, 1/4 cup honey or maple syrup, and 1 teaspoon vanilla extract to the avocados.",
+                    tip: "Taste and adjust sweetness - some people prefer less sweet desserts!"
+                },
+                {
+                    title: "Blend until smooth",
+                    instruction: "Process for 2-3 minutes until completely smooth and creamy. Scrape down sides as needed. Add 2-3 tablespoons milk if too thick.",
+                    tip: "The longer you blend, the silkier the texture becomes!"
+                },
+                {
+                    title: "Chill and serve",
+                    instruction: "Transfer to serving bowls and refrigerate for at least 30 minutes. Garnish with berries, nuts, or a dusting of cocoa powder before serving.",
+                    tip: "This healthy dessert tastes even better the next day as flavors meld together!"
+                }
+            ]
+        };
+
+        let selectedIngredients = [];
+        let selectedPantryItems = [];
+        let selectedRecipes = {};
+        let currentRecipes = {};
+        let currentlyOpenRecipe = 0;
+
+        function setupIngredientInput() {
+            const input = document.getElementById('ingredientInput');
+            const suggestions = document.getElementById('suggestions');
+            
+            input.addEventListener('input', function() {
+                const value = this.value.toLowerCase().trim();
+                if (value.length < 2) {
+                    suggestions.style.display = 'none';
+                    return;
+                }
+
+                const filtered = commonIngredients.filter(ingredient => 
+                    ingredient.toLowerCase().includes(value) && 
+                    !selectedIngredients.includes(ingredient)
+                );
+
+                if (filtered.length > 0) {
+                    suggestions.innerHTML = filtered.slice(0, 8).map(ingredient => 
+                        `<div class="suggestion" onclick="addIngredient('${ingredient}')">${ingredient}</div>`
+                    ).join('');
+                    suggestions.style.display = 'block';
+                } else {
+                    suggestions.style.display = 'none';
+                }
+            });
+
+            input.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    const value = this.value.trim();
+                    if (value && !selectedIngredients.includes(value)) {
+                        addIngredient(value);
+                    }
+                }
+            });
+
+            input.addEventListener('blur', function() {
+                setTimeout(() => suggestions.style.display = 'none', 200);
+            });
+        }
+
+        function addIngredient(ingredient) {
+            if (!selectedIngredients.includes(ingredient)) {
+                selectedIngredients.push(ingredient);
+                updateIngredientTags();
+                const input = document.getElementById('ingredientInput');
+                input.value = '';
+                input.focus();
+                document.getElementById('suggestions').style.display = 'none';
+            }
+        }
+
+        function removeIngredient(ingredient) {
+            selectedIngredients = selectedIngredients.filter(i => i !== ingredient);
+            updateIngredientTags();
+        }
+
+        function updateIngredientTags() {
+            const tagsContainer = document.getElementById('ingredientTags');
+            const tagsHtml = selectedIngredients.map(ingredient => 
+                `<div class="ingredient-tag">
+                    ${ingredient}
+                    <span class="remove" onclick="removeIngredient('${ingredient}')">×</span>
+                </div>`
+            ).join('');
+            
+            tagsContainer.innerHTML = tagsHtml + 
+                '<input type="text" class="ingredient-input" id="ingredientInput" placeholder="Add more ingredients...">';
+            
+            setupIngredientInput();
+        }
+
+        document.getElementById('recipeForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (selectedIngredients.length === 0) {
+                alert('Please add at least one ingredient!');
+                return;
+            }
+            showSpiceCheck();
+        });
+
+        function showSpiceCheck() {
+            const cuisine = document.getElementById('cuisine').value;
+            const spiceSection = document.getElementById('spiceCheck');
+            const spiceCategories = document.getElementById('spiceCategories');
+            
+            let relevantCategories = ['Basic Seasonings', 'Cooking Oils & Fats'];
+            
+            if (cuisine === 'italian') {
+                relevantCategories.push('Italian Essentials');
+            } else if (cuisine === 'asian') {
+                relevantCategories.push('Asian Essentials');
+            } else if (cuisine === 'mexican') {
+                relevantCategories.push('Mexican Essentials');
+            } else if (cuisine === 'french') {
+                relevantCategories.push('French Cooking');
+            } else if (cuisine === 'american') {
+                relevantCategories.push('American Staples');
+            } else if (cuisine === 'mediterranean') {
+                relevantCategories.push('Mediterranean');
+            } else if (cuisine === 'indian') {
+                relevantCategories.push('Indian Spices');
+            } else if (cuisine === 'any') {
+                relevantCategories.push('Italian Essentials', 'Asian Essentials');
+            }
+            
+            spiceCategories.innerHTML = relevantCategories.map(category => `
+                <div class="spice-category">
+                    <h4>${category}</h4>
+                    ${pantryEssentials[category].map(item => `
+                        <div class="ingredient-checkbox">
+                            <input type="checkbox" id="spice_${item.replace(/\s+/g, '_')}" value="${item}">
+                            <label for="spice_${item.replace(/\s+/g, '_')}">${item}</label>
+                        </div>
+                    `).join('')}
+                </div>
+            `).join('');
+            
+            spiceSection.style.display = 'block';
+            spiceSection.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function generateRecipesWithSpices() {
+            const checkboxes = document.querySelectorAll('#spiceCategories input[type="checkbox"]:checked');
+            selectedPantryItems = Array.from(checkboxes).map(cb => cb.value);
+            
+            const allAvailableIngredients = [...selectedIngredients, ...selectedPantryItems];
+            
+            const cuisine = document.getElementById('cuisine').value;
+            const level = document.getElementById('level').value;
+            const people = document.getElementById('people').value;
+            
+            currentRecipes = generateRecipeOptions(cuisine, level, people, allAvailableIngredients);
+            displayRecipes(currentRecipes);
+            
+            document.getElementById('spiceCheck').style.display = 'none';
+            document.getElementById('results').style.display = 'block';
+            document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function generateRecipeOptions(cuisine, level, people, ingredients) {
+            const recipes = { appetizers: [], mains: [], desserts: [] };
+
+            // Enhanced appetizer generation
+            const hasVeggies = ingredients.some(i => ['tomatoes', 'mushrooms', 'avocado', 'cheese', 'bread'].some(v => i.toLowerCase().includes(v)));
+            if (hasVeggies) {
+                if (ingredients.some(i => i.toLowerCase().includes('bread') || i.toLowerCase().includes('tomato'))) {
+                    recipes.appetizers.push({
+                        name: "Fresh Bruschetta",
+                        time: "15 min",
+                        serves: people,
+                        description: "Crispy toasted bread topped with fresh tomatoes and herbs",
+                        ingredients: ingredients.filter(i => 
+                            ['bread', 'tomato', 'garlic', 'basil', 'olive oil'].some(ing => i.toLowerCase().includes(ing))
+                        )
+                    });
+                }
+                
+                if (ingredients.some(i => i.toLowerCase().includes('cheese'))) {
+                    recipes.appetizers.push({
+                        name: "Stuffed Mushrooms",
+                        time: "25 min",
+                        serves: people,
+                        description: "Savory mushrooms filled with herbs and cheese",
+                        ingredients: ingredients.filter(i => 
+                            ['mushrooms', 'cheese', 'garlic', 'herbs'].some(ing => i.toLowerCase().includes(ing))
+                        )
+                    });
+                }
+            }
+
+            // Enhanced main course generation
+            if (ingredients.some(i => i.toLowerCase().includes('chicken'))) {
+                if (cuisine === 'italian' || cuisine === 'any') {
+                    recipes.mains.push({
+                        name: "Italian Herb Chicken",
+                        time: "35 min",
+                        serves: people,
+                        description: "Pan-seared chicken breast with aromatic Italian herbs and garlic",
+                        ingredients: ingredients.filter(i => 
+                            ['chicken', 'herb', 'garlic', 'parmesan', 'olive oil', 'oregano'].some(ing => i.toLowerCase().includes(ing))
+                        )
+                    });
+                }
+                if (cuisine === 'asian' || cuisine === 'any') {
+                    recipes.mains.push({
+                        name: "Asian Glazed Chicken",
+                        time: "25 min",
+                        serves: people,
+                        description: "Tender chicken with savory soy glaze and fresh ginger",
+                        ingredients: ingredients.filter(i => 
+                            ['chicken', 'soy', 'ginger', 'sesame', 'honey'].some(ing => i.toLowerCase().includes(ing))
+                        )
+                    });
+                }
+            }
+
+            if (ingredients.some(i => i.toLowerCase().includes('beef'))) {
+                recipes.mains.push({
+                    name: "Garlic Herb Beef",
+                    time: "30 min",
+                    serves: people,
+                    description: "Juicy beef with aromatic garlic and fresh herbs",
+                    ingredients: ingredients.filter(i => 
+                        ['beef', 'garlic', 'herbs', 'onion'].some(ing => i.toLowerCase().includes(ing))
+                    )
+                });
+            }
+
+            if (ingredients.some(i => i.toLowerCase().includes('pasta'))) {
+                recipes.mains.push({
+                    name: "Creamy Garlic Pasta",
+                    time: "20 min",
+                    serves: people,
+                    description: "Rich and creamy pasta with garlic and herbs",
+                    ingredients: ingredients.filter(i => 
+                        ['pasta', 'garlic', 'olive oil', 'parmesan', 'cream'].some(ing => i.toLowerCase().includes(ing))
+                    )
+                });
+            }
+
+            if (ingredients.some(i => i.toLowerCase().includes('salmon'))) {
+                recipes.mains.push({
+                    name: "Herb-Crusted Salmon",
+                    time: "25 min",
+                    serves: people,
+                    description: "Flaky salmon with a delicious herb crust",
+                    ingredients: ingredients.filter(i => 
+                        ['salmon', 'herbs', 'lemon', 'olive oil'].some(ing => i.toLowerCase().includes(ing))
+                    )
+                });
+            }
+
+            // New dessert generation
+            if (ingredients.some(i => ['berries', 'strawberries', 'yogurt', 'cream'].some(ing => i.toLowerCase().includes(ing)))) {
+                recipes.desserts.push({
+                    name: "Simple Berry Parfait",
+                    time: "10 min",
+                    serves: people,
+                    description: "Fresh berries layered with creamy yogurt",
+                    ingredients: ingredients.filter(i => 
+                        ['berries', 'strawberries', 'yogurt', 'honey'].some(ing => i.toLowerCase().includes(ing))
+                    )
+                });
+            }
+
+            if (ingredients.some(i => ['avocado', 'chocolate'].some(ing => i.toLowerCase().includes(ing)))) {
+                recipes.desserts.push({
+                    name: "Chocolate Avocado Mousse",
+                    time: "15 min",
+                    serves: people,
+                    description: "Rich, healthy chocolate mousse made with avocado",
+                    ingredients: ingredients.filter(i => 
+                        ['avocado', 'chocolate', 'honey', 'vanilla'].some(ing => i.toLowerCase().includes(ing))
+                    )
+                });
+            }
+
+            if (ingredients.some(i => ['bananas', 'flour', 'eggs'].some(ing => i.toLowerCase().includes(ing)))) {
+                recipes.desserts.push({
+                    name: "Simple Banana Pancakes",
+                    time: "20 min",
+                    serves: people,
+                    description: "Fluffy pancakes with sweet banana flavor",
+                    ingredients: ingredients.filter(i => 
+                        ['bananas', 'flour', 'eggs', 'milk', 'honey'].some(ing => i.toLowerCase().includes(ing))
+                    )
+                });
+            }
+
+            return recipes;
+        }
+
+        function displayRecipes(recipes) {
+            const categoriesContainer = document.getElementById('dynamicCategories');
+            categoriesContainer.innerHTML = '';
+
+            const categoryConfig = {
+                appetizers: { emoji: '🥗', name: 'Appetizers' },
+                mains: { emoji: '🍖', name: 'Main Courses' },
+                desserts: { emoji: '🍰', name: 'Desserts' }
+            };
+
+            Object.entries(recipes).forEach(([category, items]) => {
+                if (items && items.length > 0) {
+                    const categoryDiv = document.createElement('div');
+                    categoryDiv.className = 'category';
+                    
+                    const config = categoryConfig[category];
+                    
+                    categoryDiv.innerHTML = `
+                        <h2>${config.emoji} ${config.name}</h2>
+                        <div id="${category}">
+                            ${items.map((recipe, index) => `
+                                <div class="recipe-card">
+                                    <h3>${recipe.name}</h3>
+                                    <div class="recipe-meta">
+                                        <span>⏱️ ${recipe.time}</span>
+                                        <span>👥 Serves ${recipe.serves}</span>
+                                    </div>
+                                    <p>${recipe.description}</p>
+                                    <p><strong>Using:</strong> ${recipe.ingredients.slice(0, 4).join(', ')}${recipe.ingredients.length > 4 ? '...' : ''}</p>
+                                    <button class="select-btn" onclick="selectRecipe('${category}', ${index})">Select This Recipe</button>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                    categoriesContainer.appendChild(categoryDiv);
+                }
+            });
+        }
+
+        function selectRecipe(category, index) {
+            document.querySelectorAll(`#${category} .recipe-card`).forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            const cards = document.querySelectorAll(`#${category} .recipe-card`);
+            cards[index].classList.add('selected');
+            
+            selectedRecipes[category] = currentRecipes[category][index];
+        }
+
+        function generateInstructions() {
+            if (Object.keys(selectedRecipes).length === 0) {
+                alert('Please select at least one recipe first!');
+                return;
+            }
+
+            const instructionContent = document.getElementById('instructionContent');
+            instructionContent.innerHTML = '';
+            currentlyOpenRecipe = 0;
+
+            const recipeEntries = Object.entries(selectedRecipes);
+            
+            recipeEntries.forEach(([category, recipe], index) => {
+                const section = document.createElement('div');
+                section.className = 'recipe-section';
+                section.innerHTML = `
+                    <div class="recipe-header" onclick="toggleRecipeContent('${category}')">
+                        <h3>${recipe.name}</h3>
+                        <span>${index === 0 ? '▲' : '▼'}</span>
+                    </div>
+                    <div class="recipe-content ${index === 0 ? 'active' : ''}" id="content_${category}">
+                        ${generateDetailedSteps(recipe)}
+                        ${index === 0 ? `<button class="fold-btn" onclick="foldCurrentAndShowNext(${index})">Fold this recipe and show next</button>` : ''}
+                    </div>
+                `;
+                instructionContent.appendChild(section);
+            });
+
+            document.getElementById('instructions').style.display = 'block';
+            document.getElementById('instructions').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function foldCurrentAndShowNext(currentIndex) {
+            const allContents = document.querySelectorAll('.recipe-content');
+            const allHeaders = document.querySelectorAll('.recipe-header span');
+            const currentFoldBtn = allContents[currentIndex].querySelector('.fold-btn');
+            
+            // Fold current recipe
+            allContents[currentIndex].classList.remove('active');
+            allHeaders[currentIndex].textContent = '▼';
+            if (currentFoldBtn) currentFoldBtn.remove();
+            
+            // Show next recipe if it exists
+            if (currentIndex + 1 < allContents.length) {
+                allContents[currentIndex + 1].classList.add('active');
+                allHeaders[currentIndex + 1].textContent = '▲';
+                
+                // Add fold button to next recipe
+                const nextContent = allContents[currentIndex + 1];
+                const foldBtn = document.createElement('button');
+                foldBtn.className = 'fold-btn';
+                foldBtn.textContent = 'Fold this recipe and show next';
+                foldBtn.onclick = () => foldCurrentAndShowNext(currentIndex + 1);
+                nextContent.appendChild(foldBtn);
+            }
+        }
+
+        function toggleRecipeContent(category) {
+            const content = document.getElementById(`content_${category}`);
+            const header = content.previousElementSibling;
+            const arrow = header.querySelector('span');
+            
+            if (content.classList.contains('active')) {
+                content.classList.remove('active');
+                arrow.textContent = '▼';
+            } else {
+                content.classList.add('active');
+                arrow.textContent = '▲';
+            }
+        }
+
+        function generateDetailedSteps(recipe) {
+            const steps = detailedRecipeSteps[recipe.name] || [
+                {
+                    title: "Prepare ingredients",
+                    instruction: "Gather all your ingredients and prep your workspace. This makes cooking much smoother!",
+                    tip: "Mise en place - having everything ready is the secret to successful cooking!"
+                },
+                {
+                    title: "Start cooking",
+                    instruction: "Follow the basic cooking method for your chosen dish, adjusting seasoning to taste.",
+                    tip: "Taste as you go - you're the chef, trust your palate!"
+                }
+            ];
+
+            return steps.map((step, index) => `
+                <div class="step">
+                    <h4>Step ${index + 1}: ${step.title}</h4>
+                    <p>${step.instruction}</p>
+                    ${step.tip ? `<div class="tip">💡 Chef's Tip: ${step.tip}</div>` : ''}
+                </div>
+            `).join('');
+        }
+
+        function showExperience() {
+            const occasion = document.getElementById('occasion').value;
+            const cuisine = document.getElementById('cuisine').value;
+            
+            generateExperienceRecommendations(occasion, cuisine);
+            document.getElementById('experience').style.display = 'block';
+            document.getElementById('experience').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function generateExperienceRecommendations(occasion, cuisine) {
+            const recommendations = {
+                drinks: {
+                    romantic: {
+                        italian: ["Chianti Classico", "Prosecco di Valdobbiadene", "Aperol Spritz"],
+                        asian: ["Sake (Junmai)", "Plum Wine", "Jasmine Green Tea"],
+                        mexican: ["Mezcal", "Paloma Cocktail", "Corona with Lime"],
+                        french: ["Bordeaux Red Wine", "Champagne", "French Press Coffee"],
+                        any: ["Pinot Noir", "Champagne", "Craft Old Fashioned"]
+                    },
+                    casual: {
+                        italian: ["Coca-Cola", "San Pellegrino Sparkling Water", "Italian Soda"],
+                        asian: ["Green Tea", "Ramune Soda", "Thai Iced Tea"],
+                        mexican: ["Coca-Cola", "Horchata", "Fresh Lime Water"],
+                        american: ["Coca-Cola", "Root Beer", "Iced Tea"],
+                        any: ["Sprite", "Iced Coffee", "Craft Beer"]
+                    },
+                    family: {
+                        any: ["Apple Juice", "Lemonade", "Sparkling Water", "Milk"]
+                    }
+                },
+                desserts: {
+                    romantic: {
+                        italian: ["Tiramisu", "Panna Cotta", "Cannoli", "Gelato (Stracciatella)"],
+                        asian: ["Mochi Ice Cream", "Green Tea Cheesecake", "Mango Sticky Rice"],
+                        mexican: ["Tres Leches Cake", "Churros with Chocolate", "Flan"],
+                        french: ["Crème Brûlée", "Chocolate Soufflé", "Macarons", "Tarte Tatin"],
+                        american: ["New York Cheesecake", "Apple Pie", "Chocolate Lava Cake"],
+                        any: ["Dark Chocolate Truffles", "Strawberries & Cream", "Classic Crème Brûlée"]
+                    },
+                    casual: {
+                        italian: ["Gelato", "Biscotti with Coffee", "Limoncello Cake"],
+                        asian: ["Fortune Cookies", "Sesame Balls", "Red Bean Ice Cream"],
+                        mexican: ["Sopapillas", "Mexican Hot Chocolate", "Coconut Flan"],
+                        american: ["Brownies", "Chocolate Chip Cookies", "Ice Cream Sundae"],
+                        any: ["Fresh Fruit Salad", "Yogurt Parfait", "Simple Chocolate Mousse"]
+                    },
+                    family: {
+                        any: ["Homemade Cookies", "Fruit Popsicles", "Banana Split", "Rice Pudding"]
+                    },
+                    celebration: {
+                        any: ["Birthday Cake", "Champagne Cupcakes", "Chocolate Fountain", "Festive Trifle"]
+                    }
+                },
+                music: {
+                    romantic: {
+                        italian: ["Andrea Bocelli", "Pavarotti Greatest Hits", "Italian Jazz Café"],
+                        asian: ["Studio Ghibli Piano Collection", "Traditional Japanese Flute", "K-Pop Ballads"],
+                        french: ["Édith Piaf", "French Café Music", "Debussy Piano Works"],
+                        any: ["Norah Jones", "Billie Holiday", "Ed Sheeran Acoustic"]
+                    },
+                    casual: {
+                        any: ["Taylor Swift", "Bruno Mars", "The Weeknd", "Dua Lipa"]
+                    },
+                    celebration: {
+                        any: ["Beyoncé", "Justin Timberlake", "Pharrell Williams", "Daft Punk"]
+                    }
+                },
+                entertainment: {
+                    romantic: {
+                        italian: ["The Godfather", "Roman Holiday", "Under the Tuscan Sun"],
+                        asian: ["Your Name (Anime)", "Lost in Translation", "Crazy Rich Asians"],
+                        french: ["Amélie", "Midnight in Paris", "Julie & Julia"],
+                        any: ["Casablanca", "The Notebook", "Pride and Prejudice (2005)"]
+                    },
+                    casual: {
+                        italian: ["Chef's Table: Pizza", "Stanley Tucci: Searching for Italy"],
+                        asian: ["Street Food: Asia", "Chef's Table: BBQ"],
+                        any: ["The Great British Baking Show", "Friends", "The Office"]
+                    },
+                    family: {
+                        any: ["Pixar Movies", "Marvel Avengers", "Disney Classics"]
+                    },
+                    celebration: {
+                        any: ["La La Land", "Mamma Mia!", "The Greatest Showman"]
+                    }
+                },
+                ambiance: {
+                    romantic: [
+                        "Dim lighting with 4-6 pillar candles as centerpiece",
+                        "Soft instrumental music at 25% volume",
+                        "Cloth napkins and your finest dinnerware",
+                        "Fresh red roses or white peonies in a simple vase",
+                        "Warm white string lights around the dining area"
+                    ],
+                    casual: [
+                        "Natural daylight or warm LED bulbs",
+                        "Upbeat but not overwhelming background music",
+                        "Colorful placemats or casual table setting",
+                        "Small potted herbs or succulents as decoration"
+                    ],
+                    family: [
+                        "Bright, welcoming overhead lighting",
+                        "Family photos as table decoration",
+                        "Comfortable seating for everyone",
+                        "Kid-friendly playlist in the background"
+                    ],
+                    celebration: [
+                        "Festive string lights or party lighting",
+                        "Balloons or themed decorations",
+                        "Upbeat party playlist",
+                        "Special occasion plates and glasses"
+                    ]
+                }
+            };
+
+            const drinks = recommendations.drinks[occasion]?.[cuisine] || 
+                          recommendations.drinks[occasion]?.any || 
+                          recommendations.drinks.casual.any;
+
+            const desserts = recommendations.desserts[occasion]?.[cuisine] || 
+                            recommendations.desserts[occasion]?.any || 
+                            recommendations.desserts.casual.any;
+
+            const music = recommendations.music[occasion]?.[cuisine] || 
+                         recommendations.music[occasion]?.any || 
+                         recommendations.music.casual.any;
+
+            const shows = recommendations.entertainment[occasion]?.[cuisine] || 
+                         recommendations.entertainment[occasion]?.any || 
+                         recommendations.entertainment.casual.any;
+
+            const ambiance = recommendations.ambiance[occasion] || recommendations.ambiance.casual;
+
+            document.getElementById('drinks').innerHTML = drinks.map(drink => `<p>• ${drink}</p>`).join('');
+            document.getElementById('desserts').innerHTML = desserts.map(dessert => `<p>• ${dessert}</p>`).join('');
+            document.getElementById('music').innerHTML = music.map(artist => `<p>• ${artist}</p>`).join('');
+            document.getElementById('entertainment').innerHTML = shows.map(show => `<p>• ${show}</p>`).join('');
+            document.getElementById('ambiance').innerHTML = ambiance.map(idea => `<p>• ${idea}</p>`).join('');
+        }
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            setupIngredientInput();
+            
+            // Close suggestions when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.ingredients-container')) {
+                    document.getElementById('suggestions').style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
